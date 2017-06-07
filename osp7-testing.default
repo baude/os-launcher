@@ -1,0 +1,27 @@
+# This playbook assumes we are using the osp7 atomic-e2e-jenkins-test tenant
+# The 'net-id' and floating IP pool is unique to that tenant
+---
+- hosts: localhost
+  connection: local
+
+  vars:
+    userdata: "{{ lookup('file', '/home/bbaude/ansible/nodes/cloud-user.data') }}"
+
+  tasks:
+    - os_server:
+        state: present
+        name: 
+        image: 
+        wait: yes
+        # flavor_id: 2 == m1.small
+        flavor: '{{ flavor | default("2") }}'
+        nics:
+          - net-id: db4017ce-d00d-454d-ae55-a6904f78f8a2
+        user_data: "{{ userdata }}"
+        floating_ip_pools:
+          - "10.8.172.0/22"
+      register: nova_result
+    - debug:
+        var: nova_result.server.public_v4
+    - debug:
+        var: nova_result.server.id
