@@ -8,9 +8,9 @@ from tempfile import NamedTemporaryFile
 def load_defaults():
     with open("launcher.conf", 'r') as stream:
         conf_yaml = yaml.load(stream)
-        return conf_yaml['default_flavor'], conf_yaml['default_image'], conf_yaml['default_yaml_file_path']
+        return conf_yaml['default_flavor'], conf_yaml['default_image'], conf_yaml['default_yaml_file_path'], conf_yaml['default_instance_name']
 
-default_flavor, default_image, default_yaml_file_path = load_defaults()
+default_flavor, default_image, default_yaml_file_path, default_instance_name = load_defaults()
 default_flavor_id = get_flavors().get_id_from_flavor(default_flavor)
 
 def check_if_python2():
@@ -55,7 +55,7 @@ def _exit():
 
 
 def form_yaml(image, name, id):
-    input_yml_file = "/home/bbaude/ansible/nodes/osp7-testing.default"
+    input_yml_file = default_yaml_file_path
     with open(input_yml_file, 'r') as stream:
         input_yaml = yaml.load(stream)
     tasks = input_yaml[0]['tasks']
@@ -75,7 +75,7 @@ def form_yaml(image, name, id):
 
 def launch_instance(image, name, id):
     # ansible-playbook  osp7-testing.yml -e 'name=baude image=Fedora-Cloud-Base-26-20170605.n.0'
-    yaml_file_name = form_yaml(image, 'baude', id)
+    yaml_file_name = form_yaml(image, default_instance_name, id)
     cmd = ['ansible-playbook', '-vvv', yaml_file_name]
     print(" ".join(cmd))
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
